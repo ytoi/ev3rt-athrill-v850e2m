@@ -23,5 +23,14 @@ start: appdir
 debug: appdir
 	$(ADDITIONAL_PRE_APPL)
 	athrill2 -c1 -i -m ../common/memory.txt -d ../common/device_config.txt -t -1 asp
+
+use_proxy: appdir
+	athrill2 -c1  -m ../common/memory.txt -d ../common/device_proxy_config.txt -t -1 $(APPLDIR).asp
+
+start_proxy: appdir
+	athrill2 -c1  -m ../common/memory.txt -d ../common/device_config.txt -t -1 athrill_proxy.asp
+
+
+
 appdir:
 	@echo "make asp first!"

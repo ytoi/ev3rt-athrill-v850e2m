@@ -58,7 +58,7 @@ endif
 # Target for an application (static)
 #
 ifdef img
-
+APPMAME = $(img)
 include $(APPLDIR)/Makefile.inc
 
 ifeq (,$(wildcard $(LIBKERNELDIR)/libkernel.a))
@@ -72,6 +72,7 @@ endif
 	make -j8 > /dev/null ) && \
 	cp $(OBJDIR)/$(OBJFILENAME) $(PWD) && \
 	echo "$(APPLDIR)" > $(PWD)/appdir
+	cp $(OBJFILENAME) $(PWD)/$(img).asp
 
 $(LIBKERNELDIR)/libkernel.a: prepare-obj-folder
 	@cd $(OBJDIR) && \
@@ -85,6 +86,8 @@ endif
 # Target for an application module (dynamic)
 #
 ifdef app
+
+APPMAME = $(app)
 
 include $(APPLDIR)/Makefile.inc
 
@@ -132,6 +135,7 @@ uploadimg:
 
 clean:
 	rm -rf $(OBJDIR)
+	
 
 realclean: clean
 	rm -rf $(notdir $(OBJFILENAME)) uImage app $(LIBKERNELDIR)/libkernel.a

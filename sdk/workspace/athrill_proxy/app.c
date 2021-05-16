@@ -242,7 +242,7 @@ static int sensorColorSensorGetRgbRaw(unsigned int additionalKey, int *value)
 	static rgb_raw_t rgb;
 	int col_type = getColorSensorType();
 	if ( col_type !=  COLOR_SENSOR_MODE_RGB ) {
-		return SENSOR_NOT_USED;
+		return 0;
 	}
 	sensor_port_t port = getColorSensorPort();
 	if ( port != TNUM_SENSOR_PORT ) {
@@ -326,18 +326,21 @@ static int sensorUltrasonicSensorGet(unsigned int additionalKey, int *value)
 
 	get_tim(&now);
 
-	if ( (now - last) >= ULTRASONIC_CORRECT_THREATH_TIME ) {
+	if ( last == 0 || (now - last) >= ULTRASONIC_CORRECT_THREATH_TIME ) {
 		canCorrectData = 1;
 	} 
 	
+	last = now;
 	
 	sensor_port_t port = getUltraSonicSensorPort();
 	if ( port != TNUM_SENSOR_PORT ) {
 		if ( additionalKey == 0 ) {
-			static unsigned int lastDistance = 0;
+			static int lastDistance = -1;
 			if ( canCorrectData ) {
 				lastDistance =  ev3_ultrasonic_sensor_get_distance(port);
 			}
+			// 最初などは値が入っていないので、補正する
+			if ( lastDistance == 0 ) lastDistance = -1;
 			*value = lastDistance;
 		} else if ( additionalKey == 1 ) {
 			static unsigned int lastListen = 0;
