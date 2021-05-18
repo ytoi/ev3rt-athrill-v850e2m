@@ -337,11 +337,13 @@ static int sensorUltrasonicSensorGet(unsigned int additionalKey, int *value)
 		if ( additionalKey == 0 ) {
 			static int lastDistance = -1;
 			if ( canCorrectData ) {
-				lastDistance =  ev3_ultrasonic_sensor_get_distance(port);
+				// ev3_ultrasonic sensor make value 1/10. so we have to consider it.
+				lastDistance =  ev3_ultrasonic_sensor_get_distance(port) * 10;
 			}
 			// 最初などは値が入っていないので、補正する
 			if ( lastDistance == 0 ) lastDistance = -1;
 			*value = lastDistance;
+//			printf("distance=%d   ",lastDistance);
 		} else if ( additionalKey == 1 ) {
 			static unsigned int lastListen = 0;
 			if ( canCorrectData ) {
@@ -747,7 +749,7 @@ void mainLoop(void)
 		ret = receiveMessage(fp, (unsigned char*)&msg, sizeof(msg));
 	//		LOG("Msg=%d\n",msg.cmd);
 
-		if ( ret > 0 ) {
+		if ( ret > 0 && msg.len > 0) {
 			ret = receiveMessage(fp, payload.data, msg.len);
 			//LOG("Msg PL msg.len=%d size=%d\n",msg.len,ret);
 		}  else if ( ret < 0 ) {
