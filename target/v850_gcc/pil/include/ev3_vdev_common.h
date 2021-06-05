@@ -112,4 +112,8 @@
 #define EV3_GYRO_INX_RESET_TOP      (0U)
 #define EV3_GYRO_INX_RESET          (0U)
 
+#define EV3_COLOR_SENSOR_MODE_OFF        (92U)    
+#define EV3_COLOR_SENSOR_MODE_OFF_TYPE(index)           ( EV3_COLOR_SENSOR_MODE_OFF + ((index) * 4U))
+
+
 #endif /* _EV3_VDEV_COMMON_H_ */

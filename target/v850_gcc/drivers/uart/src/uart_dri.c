@@ -84,7 +84,16 @@ void uart_dri_get_data_color(uint8_t index, uint8_t mode, void *dest, SIZE size)
 {
 	uint8_t *data8 = (uint8_t*)dest;
 	uint16_t *array = (uint16_t*)dest;
-	DRI_COLOR_SENSOR_MODES dri_mode = mode;
+	static int dri_modes[4] = {0};
+
+	int dri_mode = dri_modes[index];	
+
+	// Write Color Sensor Mode
+	if ( dri_mode != mode ) {
+		sil_wrw_mem((uint32_t *)EV3_COLOR_SENSOR_MODE_ADDR_INX(index),mode);
+		dri_modes[index] = mode;
+	}
+
 	if (dri_mode == DRI_COL_REFLECT) {
 		*data8 = (uint8_t)sil_rew_mem( (const uint32_t *)EV3_SENSOR_ADDR_REFLECT(index));
 	}

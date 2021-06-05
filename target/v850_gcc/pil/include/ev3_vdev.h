@@ -172,5 +172,12 @@ static inline int EV3_SENSOR_ADDR_RGB_B(int index)
 #define EV3_GYRO_ADDR_INX(index)	(VDEV_TX_DATA_BASE + EV3_GYRO_OFF_TYPE(index))
 #define EV3_GYRO_ADDR_RESET     EV3_GYRO_ADDR_INX(EV3_GYRO_INX_RESET)
 
+/*
+ * Color Sensor Mode
+ * 4bytes data
+ */
+ #define EV3_COLOR_SENSOR_MODE_ADDR_INX(index) (VDEV_TX_DATA_BASE + EV3_COLOR_SENSOR_MODE_OFF_TYPE(index))
+
+
 
 #endif /* _EV3_VDEV_H_ */

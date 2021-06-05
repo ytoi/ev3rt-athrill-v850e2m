@@ -133,6 +133,8 @@ static void processData(unsigned int offset, unsigned int data)
 #endif
 
 // Senser 
+// センサーで4byteを扱うことがないため、intの正の最大数を使用しない数値として定義する
+#define SENSOR_NOT_USED (0x7fffffff)
 // Athrillから来る128byte目をセンサーのTypeとして使用する
 // これはev3rt-athrillのDRI_COL_XXX (target/v850_gcc/uart/src/uart_dri.c)にあわせる
 #define COLOR_SENSOR_MODE_INDEX (128)
@@ -242,7 +244,7 @@ static int sensorColorSensorGetRgbRaw(unsigned int additionalKey, int *value)
 	static rgb_raw_t rgb;
 	int col_type = getColorSensorType();
 	if ( col_type !=  COLOR_SENSOR_MODE_RGB ) {
-		return 0;
+		return SENSOR_NOT_USED;
 	}
 	sensor_port_t port = getColorSensorPort();
 	if ( port != TNUM_SENSOR_PORT ) {
@@ -326,24 +328,19 @@ static int sensorUltrasonicSensorGet(unsigned int additionalKey, int *value)
 
 	get_tim(&now);
 
-	if ( last == 0 || (now - last) >= ULTRASONIC_CORRECT_THREATH_TIME ) {
+	if ( (now - last) >= ULTRASONIC_CORRECT_THREATH_TIME ) {
 		canCorrectData = 1;
 	} 
 	
-	last = now;
 	
 	sensor_port_t port = getUltraSonicSensorPort();
 	if ( port != TNUM_SENSOR_PORT ) {
 		if ( additionalKey == 0 ) {
-			static int lastDistance = -1;
+			static unsigned int lastDistance = 0;
 			if ( canCorrectData ) {
-				// ev3_ultrasonic sensor make value 1/10. so we have to consider it.
-				lastDistance =  ev3_ultrasonic_sensor_get_distance(port) * 10;
+				lastDistance =  ev3_ultrasonic_sensor_get_distance(port);
 			}
-			// 最初などは値が入っていないので、補正する
-			if ( lastDistance == 0 ) lastDistance = -1;
 			*value = lastDistance;
-//			printf("distance=%d   ",lastDistance);
 		} else if ( additionalKey == 1 ) {
 			static unsigned int lastListen = 0;
 			if ( canCorrectData ) {
@@ -749,7 +746,7 @@ void mainLoop(void)
 		ret = receiveMessage(fp, (unsigned char*)&msg, sizeof(msg));
 	//		LOG("Msg=%d\n",msg.cmd);
 
-		if ( ret > 0 && msg.len > 0) {
+		if ( ret > 0 ) {
 			ret = receiveMessage(fp, payload.data, msg.len);
 			//LOG("Msg PL msg.len=%d size=%d\n",msg.len,ret);
 		}  else if ( ret < 0 ) {
